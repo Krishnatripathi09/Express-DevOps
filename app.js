@@ -1,6 +1,7 @@
 const express = require("express");
 const { connectDB } = require("./config/db");
 const { User } = require("./models/userSchema");
+const bcrypt = require("bcrypt");
 const app = express();
 
 const PORT = 3001;
@@ -25,11 +26,13 @@ app.post("/signup", async (req, res) => {
     res.status(400).send("All the information is Required");
   }
 
+  const passwordHash = await bcrypt.hash(password, 10);
+
   const userData = await User({
     firstName,
     lastName,
     email,
-    password,
+    password: passwordHash,
   });
 
   await userData.save();
