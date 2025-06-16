@@ -1,5 +1,6 @@
 const express = require("express");
 const { connectDB } = require("./config/db");
+const { User } = require("./models/userSchema");
 const app = express();
 
 const PORT = 3001;
@@ -17,13 +18,21 @@ connectDB()
     console.log("Error Occured :" + err);
   });
 
-app.post("/signup", (req, res) => {
+app.post("/signup", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
 
   if (!firstName || !lastName || !email || !password) {
     res.status(400).send("All the information is Required");
   }
 
-  console.log(firstName, lastName, email, password);
-  res.send("Logged the Details");
+  const userData = await User({
+    firstName,
+    lastName,
+    email,
+    password,
+  });
+
+  await userData.save();
+
+  res.status(201).send("Signed Up SuccessFully");
 });
