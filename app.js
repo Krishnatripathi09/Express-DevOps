@@ -39,3 +39,9 @@ app.post("/signup", async (req, res) => {
 
   res.status(201).send("Signed Up SuccessFully");
 });
+
+app.post("/signin", (req, res) => {
+  const { email, password } = req.body;
+
+  
+});
