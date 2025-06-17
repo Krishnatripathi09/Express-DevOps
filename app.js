@@ -60,3 +60,9 @@ app.post("/signin", async (req, res) => {
     res.status(400).send("Please Enter Valid Credentials ==>Password");
   }
 });
+
+app.get("/users", async (req, res) => {
+  const users = await User.find({}).select("firstName lastName email");
+
+  res.status(200).send("All Users ===> " + users);
+});
