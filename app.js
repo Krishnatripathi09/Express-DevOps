@@ -40,8 +40,23 @@ app.post("/signup", async (req, res) => {
   res.status(201).send("Signed Up SuccessFully");
 });
 
-app.post("/signin", (req, res) => {
+app.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
-  
+  if (!email || !password) {
+    res.status(400).send("Please Enter Email and Password");
+  }
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    res.status(400).send("Please Enter Valid Credentials ==> Email");
+  }
+  const passwordHash = user.password;
+  const validPassword = await bcrypt.compare(password, passwordHash);
+
+  if (validPassword) {
+    res.status(200).send("Logged-In SuccessFully");
+  } else {
+    res.status(400).send("Please Enter Valid Credentials ==>Password");
+  }
 });
