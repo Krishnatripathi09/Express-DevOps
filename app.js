@@ -2,6 +2,7 @@ const express = require("express");
 const { connectDB } = require("./config/db");
 const { User } = require("./models/userSchema");
 const bcrypt = require("bcrypt");
+const { validate } = require("./utils/validation.js");
 const app = express();
 
 const PORT = 3001;
@@ -20,9 +21,10 @@ connectDB()
   });
 
 app.post("/signup", async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
+  validate(req, res);
+  const { firstName, lastName, gender, email, password } = req.body;
 
-  if (!firstName || !lastName || !email || !password) {
+  if (!firstName || !lastName || !gender || !email || !password) {
     res.status(400).send("All the information is Required");
   }
 
@@ -31,6 +33,7 @@ app.post("/signup", async (req, res) => {
   const userData = await User({
     firstName,
     lastName,
+    gender,
     email,
     password: passwordHash,
   });
