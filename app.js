@@ -6,6 +6,7 @@ const { validate } = require("./utils/validation.js");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/userAuth.js");
 
 const app = express();
 
@@ -61,7 +62,6 @@ app.post("/signin", async (req, res) => {
   }
   const passwordHash = user.password;
   const validPassword = await bcrypt.compare(password, passwordHash);
-
   const token = jwt.sign({ id: user.id }, "MySecretIsSecret@%^*123", {
     expiresIn: "1hr",
   });
@@ -77,12 +77,8 @@ app.post("/signin", async (req, res) => {
   }
 });
 
-app.get("/users", async (req, res) => {
-  const { token } = req.cookies;
+app.get("/users", userAuth, async (req, res) => {
+  const user = req.user;
 
-  const { id } = jwt.verify(token, "MySecretIsSecret@%^*123");
-
-  const users = await User.findById(id).select("firstName lastName email");
-
-  res.status(200).send("All Users ===> " + users);
+  res.status(200).send("User ==>" + user);
 });
