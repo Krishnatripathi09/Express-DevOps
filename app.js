@@ -3,11 +3,12 @@ const { connectDB } = require("./config/db");
 const { User } = require("./models/userSchema");
 const bcrypt = require("bcrypt");
 const { validate } = require("./utils/validation.js");
+const helmet = require("helmet");
 const app = express();
 
 const PORT = 3001;
 app.use(express.json());
-
+app.use(helmet());
 connectDB()
   .then(() => {
     console.log("Connection to DataBase SuccessFull");
