@@ -4,11 +4,15 @@ const { User } = require("./models/userSchema");
 const bcrypt = require("bcrypt");
 const { validate } = require("./utils/validation.js");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+
 const app = express();
 
 const PORT = 3001;
 app.use(express.json());
 app.use(helmet());
+app.use(cookieParser());
 connectDB()
   .then(() => {
     console.log("Connection to DataBase SuccessFull");
@@ -58,7 +62,10 @@ app.post("/signin", async (req, res) => {
   const passwordHash = user.password;
   const validPassword = await bcrypt.compare(password, passwordHash);
 
+  const token = jwt.sign({ id: user.id }, "MySecretIsSecret@%^*123");
+
   if (validPassword) {
+    res.cookie("token", token);
     res.status(200).send("Logged-In SuccessFully");
   } else {
     res.status(400).send("Please Enter Valid Credentials ==>Password");
@@ -66,7 +73,9 @@ app.post("/signin", async (req, res) => {
 });
 
 app.get("/users", async (req, res) => {
-  const users = await User.find({}).select("firstName lastName email");
+  const cookie = req.cookies;
+  console.log(cookie);
+  const users = await User.findOne({}).select("firstName lastName email");
 
   res.status(200).send("All Users ===> " + users);
 });
