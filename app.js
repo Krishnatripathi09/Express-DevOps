@@ -62,10 +62,15 @@ app.post("/signin", async (req, res) => {
   const passwordHash = user.password;
   const validPassword = await bcrypt.compare(password, passwordHash);
 
-  const token = jwt.sign({ id: user.id }, "MySecretIsSecret@%^*123");
+  const token = jwt.sign({ id: user.id }, "MySecretIsSecret@%^*123", {
+    expiresIn: "1hr",
+  });
 
   if (validPassword) {
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      expires: new Date(Date.now() + 900000),
+      httpOnly: true,
+    });
     res.status(200).send("Logged-In SuccessFully");
   } else {
     res.status(400).send("Please Enter Valid Credentials ==>Password");
@@ -73,9 +78,11 @@ app.post("/signin", async (req, res) => {
 });
 
 app.get("/users", async (req, res) => {
-  const cookie = req.cookies;
-  console.log(cookie);
-  const users = await User.findOne({}).select("firstName lastName email");
+  const { token } = req.cookies;
+
+  const { id } = jwt.verify(token, "MySecretIsSecret@%^*123");
+
+  const users = await User.findById(id).select("firstName lastName email");
 
   res.status(200).send("All Users ===> " + users);
 });
