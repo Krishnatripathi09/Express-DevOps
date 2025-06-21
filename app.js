@@ -60,8 +60,8 @@ app.post("/signin", async (req, res) => {
   if (!user) {
     res.status(400).send("Please Enter Valid Credentials ==> Email");
   }
-  const passwordHash = user.password;
-  const validPassword = await bcrypt.compare(password, passwordHash);
+
+  const validPassword = await user.verifyPWD(password);
   const token = await user.getJWT();
 
   if (validPassword) {
