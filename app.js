@@ -80,3 +80,11 @@ app.get("/users", userAuth, async (req, res) => {
 
   res.status(200).send("User ==>" + user);
 });
+
+app.post("/logout", (req, res) => {
+  res.clearCookie(token, null, {
+    expires: new Date(Date.now()),
+  });
+
+  res.status(200).send("Log-Out Successfull");
+});
